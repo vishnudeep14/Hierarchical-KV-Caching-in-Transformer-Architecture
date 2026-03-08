@@ -36,7 +36,7 @@ Instead of mean pooling,
 weights = softmax(q_pool · K_chunk)       # learned per-chunk importance
 summary_k = weights @ K_chunk
 summary_v = weights @ V_chunk
-
+```
 
 The pooler is a tiny attention head (negligible overhead), shared across layers.
 ALiBi:
@@ -115,4 +115,6 @@ Why LoRA FT? You change the K/V distribution with learned summaries; a light LoR
 Throughput: HiKV_Learned ~108 tok/s (flat), Sliding_L=512 ~88.2 tok/s (flat), FullCache ~62 tok/s (degrades with length)
 VRAM: HiKV_Learned / Sliding flat around ~68‑73 MB on T4; FullCache grows with length
 Samples: Learned‑HiKV maintains global topic better than Sliding at the same memory; fewer degeneracies
+
+
 
