@@ -48,15 +48,13 @@ Train only LoRA A/B for Q/K/V and the pooler (few minutes on T4)
 Adaptation aligns the model to compressed memory
 
 
-What you can expect
+**What you can expect**
 
 Throughput: flat vs generated length for Learned‑HiKV and Sliding; FullCache degrades.
 Peak VRAM: flat for Learned‑HiKV and Sliding; FullCache grows with length.
 Quality: Learned‑HiKV ≥ Sliding at equal memory budgets (after LoRA FT); often close to FullCache for many tasks on Tiny Shakespeare.
-----
-
 On small models trained from scratch without adaptation, Sliding can appear better than HiKV. Learned compression + ALiBi + LoRA FT closes that gap.
----
+
 
 
 **🧪 Quick start (Colab / T4)**
@@ -109,7 +107,7 @@ For stronger tests, cue the needle (e.g., delimiters + “repeat the token after
 Merged‑head cache: For simplicity and speed, we cache merged heads [B,1,C] during streaming. ALiBi bias uses a mean slope approximation. For maximum fidelity, per‑head caches can be implemented (more code/VRAM).
 Why ALiBi, not RoPE? RoPE encodes position inside K/V; compression breaks this. ALiBi pushes position to the score bias, robust to K/V compression.
 Why LoRA FT? You change the K/V distribution with learned summaries; a light LoRA update teaches the model how to route and trust summaries.
----
+
 
 🧪 Results
 Throughput: HiKV_Learned ~108 tok/s (flat), Sliding_L=512 ~88.2 tok/s (flat), FullCache ~62 tok/s (degrades with length)
