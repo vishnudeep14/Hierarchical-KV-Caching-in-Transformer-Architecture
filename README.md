@@ -1,4 +1,4 @@
-# Hierarchical-KV-Caching-in-Transformer-Architecture# 
+# Hierarchical-KV-Caching-in-Transformer-Architecture 
 Learned HiKV + ALiBi + LoRA Fine‑Tune: Constant‑Memory Long‑Context Inference
 
 **Goal:** A practical, reproducible recipe to get **near Full‑KV quality** at **constant memory** and **flat latency**—even on a T4—by combining:
@@ -53,13 +53,13 @@ What you can expect
 Throughput: flat vs generated length for Learned‑HiKV and Sliding; FullCache degrades.
 Peak VRAM: flat for Learned‑HiKV and Sliding; FullCache grows with length.
 Quality: Learned‑HiKV ≥ Sliding at equal memory budgets (after LoRA FT); often close to FullCache for many tasks on Tiny Shakespeare.
-
+----
 
 On small models trained from scratch without adaptation, Sliding can appear better than HiKV. Learned compression + ALiBi + LoRA FT closes that gap.
+---
 
 
-
-🧪 Quick start (Colab / T4)
+**🧪 Quick start (Colab / T4)**
 The fastest way is to run the Colab notebook in notebooks/learned_hikv_alibi_lora_colab.ipynb, which contains everything:
 
 data loading (Tiny Shakespeare)
@@ -71,9 +71,9 @@ plots + decoded samples
 CSV export
 
 
+---
 
-
-🧱 Repo contents
+**🧱 Repo contents**
 
 src/model.py: GPT‑Mini with ALiBi and LoRA Q/K/V; merged‑head streaming cache path.
 src/cache_policies.py: FullCache, SlidingWindow, HiKV_Learned (with learned pooler).
@@ -87,9 +87,9 @@ src/utils.py: reproducibility utils (seed, AMP, CUDA sync).
 
 The Colab notebook contains a single‑file version of these components.
 
+---
 
-
-🧪 Long-range recall (optional)
+**🧪 Long-range recall**
 A minimal Needle‑in‑a‑Haystack (NIAH) probe is provided in src/bench.py:
 
 teacher‑forces a long random context
@@ -102,19 +102,19 @@ FullCache ≥ Learned‑HiKV ≳ EMA ≥ Sliding
 For stronger tests, cue the needle (e.g., delimiters + “repeat the token after ###”) or use structured copy tasks.
 
 
+----
 
-
-🧠 Design notes
+**🧠 Design notes**
 
 Merged‑head cache: For simplicity and speed, we cache merged heads [B,1,C] during streaming. ALiBi bias uses a mean slope approximation. For maximum fidelity, per‑head caches can be implemented (more code/VRAM).
 Why ALiBi, not RoPE? RoPE encodes position inside K/V; compression breaks this. ALiBi pushes position to the score bias, robust to K/V compression.
 Why LoRA FT? You change the K/V distribution with learned summaries; a light LoRA update teaches the model how to route and trust summaries.
-
+---
 
 🧪 Results
 Throughput: HiKV_Learned ~108 tok/s (flat), Sliding_L=512 ~88.2 tok/s (flat), FullCache ~62 tok/s (degrades with length)
 VRAM: HiKV_Learned / Sliding flat around ~68‑73 MB on T4; FullCache grows with length
 Samples: Learned‑HiKV maintains global topic better than Sliding at the same memory; fewer degeneracies
 
-
+----
 
